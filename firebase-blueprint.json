@@ -1,0 +1,75 @@
+{
+  "entities": {
+    "ExchangeRate": {
+      "title": "Exchange Rate Settings",
+      "description": "Configuration for currency exchange rates and profit margins",
+      "type": "object",
+      "properties": {
+        "thb_to_mmk": { "type": "number" },
+        "mmk_to_thb": { "type": "number" },
+        "thb_to_mmk_profit": { "type": "number" },
+        "mmk_to_thb_profit": { "type": "number" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["thb_to_mmk", "mmk_to_thb", "updatedAt"]
+    },
+    "ServiceFee": {
+      "title": "Service Fee Settings",
+      "description": "Configuration for bank transfer and payment service fees",
+      "type": "object",
+      "properties": {
+        "banks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "cashIn": { "type": "number" },
+              "cashOut": { "type": "number" }
+            }
+          }
+        },
+        "bills": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "fee": { "type": "number" }
+            }
+          }
+        },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Transaction": {
+      "title": "Transaction Record",
+      "description": "A record of an exchange, service, or bill payment",
+      "type": "object",
+      "properties": {
+        "type": { "type": "string", "enum": ["exchange", "service", "bill"] },
+        "customerName": { "type": "string" },
+        "amount": { "type": "number" },
+        "profit": { "type": "number" },
+        "details": { "type": "object" },
+        "timestamp": { "type": "string", "format": "date-time" },
+        "createdBy": { "type": "string" }
+      },
+      "required": ["type", "amount", "profit", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/settings/rates": {
+      "schema": "ExchangeRate",
+      "description": "Global currency exchange rates"
+    },
+    "/settings/fees": {
+      "schema": "ServiceFee",
+      "description": "Global service fee configurations"
+    },
+    "/transactions/{transactionId}": {
+      "schema": "Transaction",
+      "description": "Collection of all transaction records"
+    }
+  }
+}
