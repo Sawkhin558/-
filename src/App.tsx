@@ -18,6 +18,8 @@ export default function App() {
   const [activeSection, setActiveSection] = useState('dashboard');
   const posData = usePOSData(!!user);
 
+  const [loginError, setLoginError] = useState<string | null>(null);
+
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
@@ -25,6 +27,20 @@ export default function App() {
     });
     return unsub;
   }, []);
+
+  const handleLogin = async () => {
+    try {
+      setLoginError(null);
+      await signInWithGoogle();
+    } catch (error: any) {
+      console.error('Login error:', error);
+      if (error.code === 'auth/network-request-failed') {
+        setLoginError('အင်တာနက် ချိတ်ဆက်မှု မရရှိပါ။ ကျေးဇူးပြု၍ သင်၏ connection သို့မဟုတ် browser settings (ဥပမာ- Adblocker) ကို စစ်ဆေးပါ။');
+      } else {
+        setLoginError('ဝင်ရောက်ခြင်း မအောင်မြင်ပါ။ နောက်မှ ထပ်မံ ကြိုးစားကြည့်ပါ။');
+      }
+    }
+  };
 
   if (authLoading) {
     return (
@@ -47,8 +63,15 @@ export default function App() {
           </div>
           <h1 className="text-2xl font-bold">မြန်မာ ငွေလဲနှင့် ဝန်ဆောင်မှု</h1>
           <p className="text-slate-500">POS စနစ်ကို အသုံးပြုရန် Google အကောင့်ဖြင့် ဝင်ရောက်ပါ။</p>
+          
+          {loginError && (
+            <div className="p-3 bg-red-50 border border-red-100 rounded-xl text-xs text-red-600 font-medium">
+              {loginError}
+            </div>
+          )}
+
           <button
-            onClick={signInWithGoogle}
+            onClick={handleLogin}
             className="w-full py-3 px-4 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
           >
             Google အကောင့်ဖြင့် ဝင်မည်
